@@ -1,0 +1,83 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: f(x) Login Customizer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-25 04:02+0700\n"
+"PO-Revision-Date: \n"
+"Last-Translator: dave <david.warna@gmail.com>\n"
+"Language-Team: David Chandra P. <david.warna@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_US\n"
+"X-Poedit-KeywordsList: _e;__;esc_attr_e;esc_attr__;esc_html_e;esc_html__;_x;_n;_x:1,2c;_n:1,2\n"
+"X-Poedit-Basepath: ../\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/fx-settings.php:19
+msgid "Login Customizer"
+msgstr ""
+
+#: includes/fx-settings.php:37
+msgid "Upload Logo"
+msgstr ""
+
+#: includes/fx-settings.php:40
+#: includes/fx-settings.php:180
+msgid "Remove Logo"
+msgstr ""
+
+#: includes/fx-settings.php:44
+msgid "Upload Background"
+msgstr ""
+
+#: includes/fx-settings.php:47
+#: includes/fx-settings.php:193
+msgid "Remove Background"
+msgstr ""
+
+#: includes/fx-settings.php:73
+msgid "Login logo size is 274 &times; 63, background will be tiled."
+msgstr ""
+
+#: includes/fx-settings.php:76
+msgid "Link logo to home page."
+msgstr ""
+
+#: includes/fx-settings.php:178
+msgid "Upload Login Logo"
+msgstr ""
+
+#: includes/fx-settings.php:179
+msgid "Insert Login Logo"
+msgstr ""
+
+#: includes/fx-settings.php:191
+msgid "Upload Login Background"
+msgstr ""
+
+#: includes/fx-settings.php:192
+msgid "Insert Login Background"
+msgstr ""
+
+#: includes/updater.php:237
+msgid "An Unexpected HTTP Error occurred during the API request."
+msgstr ""
+
+#: includes/updater.php:237
+msgid "Try again"
+msgstr ""
+
+#: includes/updater.php:278
+msgid "An unknown error occurred"
+msgstr ""
+
+#: includes/updater.php:314
+msgid "The plugin has been updated, but could not be reactivated. Please reactivate it manually."
+msgstr ""
+
+#: includes/updater.php:315
+msgid "Plugin reactivated successfully."
+msgstr ""
+
