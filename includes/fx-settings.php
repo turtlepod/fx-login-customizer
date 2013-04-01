@@ -7,88 +7,32 @@
  * @since 0.1.0
  */
 
-/* Add login customizer setting meta box */
-add_action( 'add_meta_boxes', 'fx_login_customizer_add_meta_box' );
+/* Register settings field */
+add_action( 'admin_init' , 'fx_login_customizer_register_settings' );
 
 /**
- * Add meta box
+ * Register Field in General Settings Page
  * @since 0.1.0
  */
-function fx_login_customizer_add_meta_box() {
+function fx_login_customizer_register_settings() {
 
-	add_meta_box(
-		'fx-login-customizer-mb',
-		__( 'Login Customizer', 'fx-login-customizer' ),
-		'fx_login_customizer_meta_box',
-		myfx_page(),
-		'normal',
-		'low'
-	);
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	/* Check capability */
+	if ( current_user_can( $config['capability'] ) ) {
+
+		/* Register settings */
+		register_setting( $config['option_group'], $config['option_name'], 'fx_login_customizer_sanitize' );
+	}
 }
 
-/**
- * Meta box Callback
- * @since 0.1.0
- */
-function fx_login_customizer_meta_box(){ ?>
-
-	<input type="text" class="login-input-hidden large-text" id="<?php echo myfx_id( 'login_logo' ); ?>" name="<?php echo myfx_name( 'login_logo' ); ?>" value="<?php echo myfx_get_option( 'login_logo' ); ?>" />
-	<input type="text" class="login-input-hidden large-text" id="<?php echo myfx_id( 'login_bg' ); ?>" name="<?php echo myfx_name( 'login_bg' ); ?>" value="<?php echo myfx_get_option( 'login_bg' ); ?>" />
-
-	<p>
-		<a href="#" class="fx-login-logo-upload button button-primary"><?php _e( 'Upload Logo', 'fx-login-customizer' ); ?></a>
-		<span class="fx-login-logo-remove-wrap">
-			<?php if ( myfx_get_option( 'login_logo' ) ) { ?>
-			<a href="#" style="margin-left:10px;" class="fx-login-logo-remove button button-secondary"><?php _e( 'Remove Logo', 'fx-login-customizer' ); ?></a>
-			<?php } ?>
-		</span>
-
-		<a href="#" class="fx-login-bg-upload button button-primary"><?php _e( 'Upload Background', 'fx-login-customizer' ); ?></a>
-		<span class="fx-login-bg-remove-wrap">
-			<?php if ( myfx_get_option( 'login_bg' ) ) { ?>
-			<a href="#" style="margin-left:10px;" class="fx-login-bg-remove button button-secondary"><?php _e( 'Remove Background', 'fx-login-customizer' ); ?></a>
-			<?php } ?>
-		</span>
-
-		<span class="mb-login-bg">
-			<input type="text" class="small-text" id="<?php echo myfx_id( 'login_bg_color' ); ?>" name="<?php echo myfx_name( 'login_bg_color' ); ?>" value="<?php echo myfx_get_option( 'login_bg_color' ); ?>" />
-		</span>
-		
-	</p>
-
-	<div id="login-preview-bg-wrap">
-
-		<div id="login-preview" style="background-image:url(<?php echo myfx_get_option( 'login_bg' ); ?>)">
-			<div class="login-logo-wrap">
-			<?php if ( myfx_get_option( 'login_logo' ) ) { ?>
-				<img class="login-logo" src="<?php echo esc_url( myfx_get_option( 'login_logo' ) ); ?>" alt="" />
-			<?php }else{ ?>
-				<img class="login-logo" src="<?php echo FX_LOGIN_CUSTOMIZER_URI . 'images/wordpress-logo.png' ?>" alt="" />
-			<?php } ?>
-			</div>
-			<div class="login-form-wrap">
-				<img src="<?php echo FX_LOGIN_CUSTOMIZER_URI . 'images/login-form.png' ?>" class="login-form">
-			</div>
-		</div>
-
-	</div>
-	<p class="howto"><?php _e( 'Login logo size is 274 &times; 63, background will be tiled.', 'fx-login-customizer' ); ?></p>
-	<p>
-		<input id="<?php echo myfx_id( 'login_logo_home_link' ); ?>" name="<?php echo myfx_name( 'login_logo_home_link' ); ?>" type="checkbox" value="1" <?php checked( myfx_get_option( 'login_logo_home_link' ), 1 ); ?>>
-		<label for="<?php echo myfx_id( 'login_logo_home_link' ); ?>"><?php _e( 'Link logo to home page.', 'fx-login-customizer' ); ?></label>
-	</p>
-
-<?php }
-
-
-/* Filter settings sanitize function */
-add_filter( 'myfx_sanitize', 'fx_login_customizer_settings_sanitize' );
 
 /**
  * Sanitize and validate settings input
  * @since 0.1.0
  */
-function fx_login_customizer_settings_sanitize( $settings ){
+function fx_login_customizer_sanitize( $settings ){
 	$settings['login_logo'] = esc_url( fx_login_customizer_validate_image( $settings['login_logo'] ) );
 	$settings['login_bg'] = esc_url( fx_login_customizer_validate_image( $settings['login_bg'] ) );
 	$settings['login_bg_color'] = fx_login_customizer_validate_color( $settings['login_bg_color'] );
@@ -138,20 +82,149 @@ function fx_login_customizer_validate_image( $input ){
 	return $output;
 }
 
-/* Add default value to settings */
-add_filter( 'myfx_defaults', 'fx_login_customizer_settings_defaults' );
-
 /**
- * Default value for favicon settings
+ * Get Option helper function
  * @since 0.1.0
  */
-function fx_login_customizer_settings_defaults( $settings ){
+function fx_login_customizer_get_option( $option = '' ) {
+
+	/* Bail early if no option defined */
+	if ( !$option ) return false;
+
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	/* Defaults */
+	$default = fx_login_customizer_defaults();
+
+	/* Get database and sanitize it */
+	$get_option = get_option( $config['option_name'], $default );
+
+	/* Get default if data not yet set */
+	if ( !isset( $get_option[ $option ] ) && isset( $default[ $option ] ) )
+		return $default[ $option ];
+
+	/* False if it's empty or not array */
+	if ( !is_array( $get_option ) || empty( $get_option[$option] ) )
+		return false;
+
+	/* If it's array return it */
+	if ( is_array( $get_option[$option] ) )
+		return $get_option[$option];
+
+	/* if not array sanitize it */
+	else
+		return wp_kses_stripslashes( $get_option[$option] );
+}
+
+/**
+ * Default value.
+ * @since 0.1.0
+ */
+function fx_login_customizer_defaults(){
+	$settings = array();
 	$settings['login_logo'] = '';
 	$settings['login_bg'] = '';
 	$settings['login_bg_color'] = '#fbfbfb';
 	$settings['login_logo_home_link'] = 0;
 	return $settings;
 }
+
+
+/* Add login customizer setting meta box */
+add_action( 'add_meta_boxes', 'fx_login_customizer_add_meta_box' );
+
+/**
+ * Add meta box
+ * @since 0.1.0
+ */
+function fx_login_customizer_add_meta_box() {
+
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	/* Check capability */
+	if ( current_user_can( $config['capability'] ) ) {
+ 
+		/* Add settings metabox */
+		add_meta_box(
+			'fx-login-customizer-mb',
+			__( 'Login Customizer', 'fx-login-customizer' ),
+			'fx_login_customizer_meta_box',
+			$config['page'],
+			'normal',
+			'low'
+		);
+	}
+}
+
+/**
+ * Meta box Callback
+ * @since 0.1.0
+ */
+function fx_login_customizer_meta_box(){
+
+	/* get config */
+	$config = fx_login_customizer_settings_config();
+?>
+
+	<input type="text" class="login-input-hidden fx_login_customizer-login_logo" id="<?php echo $config['option_name']; ?>-login_logo" name="<?php echo $config['option_name']; ?>[login_logo]" value="<?php echo fx_login_customizer_get_option( 'login_logo' ); ?>">
+
+	<input type="text" class="login-input-hidden fx_login_customizer-login_bg" id="<?php echo $config['option_name']; ?>-login_bg" name="<?php echo $config['option_name']; ?>[login_bg]" value="<?php echo fx_login_customizer_get_option( 'login_bg' ); ?>">
+
+	<p>
+		<a href="#" class="fx-login-logo-upload button button-primary"><?php _e( 'Upload Logo', 'fx-login-customizer' ); ?></a>
+		<span class="fx-login-logo-remove-wrap">
+			<?php if ( fx_login_customizer_get_option( 'login_logo' ) ) { ?>
+			<a href="#" style="margin-left:10px;" class="fx-login-logo-remove button button-secondary"><?php _e( 'Remove Logo', 'fx-login-customizer' ); ?></a>
+			<?php } ?>
+		</span>
+
+		<a href="#" class="fx-login-bg-upload button button-primary"><?php _e( 'Upload Background', 'fx-login-customizer' ); ?></a>
+		<span class="fx-login-bg-remove-wrap">
+			<?php if ( fx_login_customizer_get_option( 'login_bg' ) ) { ?>
+			<a href="#" style="margin-left:10px;" class="fx-login-bg-remove button button-secondary"><?php _e( 'Remove Background', 'fx-login-customizer' ); ?></a>
+			<?php } ?>
+		</span>
+
+		<span class="mb-login-bg">
+			<input type="text" class="small-text fx_login_customizer-login_bg_color" id="<?php echo $config['option_name']; ?>-login_bg_color" name="<?php echo $config['option_name']; ?>[login_bg_color]" value="<?php echo fx_login_customizer_get_option( 'login_bg_color' ); ?>">
+		</span>
+		
+	</p>
+
+	<div id="login-preview-bg-wrap">
+		<?php
+		/* background image inline style */
+		$bg_style = '';
+		if ( fx_login_customizer_get_option( 'login_bg' ) ){
+			$bg_style = ' style="background-image: url(' . esc_url( fx_login_customizer_get_option( 'login_bg' ) ) . ');"';
+		}
+		?>
+		<div id="login-preview"<?php echo $bg_style; ?>>
+			<div class="login-logo-wrap">
+			<?php if ( fx_login_customizer_get_option( 'login_logo' ) ) { ?>
+				<img class="login-logo" src="<?php echo esc_url( fx_login_customizer_get_option( 'login_logo' ) ); ?>" alt="" />
+			<?php }else{ ?>
+				<img class="login-logo" src="<?php echo FX_LOGIN_CUSTOMIZER_URI . 'images/wordpress-logo.png' ?>" alt="" />
+			<?php } ?>
+			</div>
+			<div class="login-form-wrap">
+				<img src="<?php echo FX_LOGIN_CUSTOMIZER_URI . 'images/login-form.png' ?>" class="login-form">
+			</div>
+		</div>
+
+	</div>
+
+	<p class="howto"><?php _e( 'Login logo size is 274 &times; 63, background will be tiled.', 'fx-login-customizer' ); ?></p>
+	
+	<p>
+		<input id="<?php echo $config['option_name']; ?>-login_logo_home_link" name="<?php echo $config['option_name']; ?>[login_logo_home_link]" type="checkbox" value="1" <?php checked( fx_login_customizer_get_option( 'login_logo_home_link' ), 1 ); ?>>
+		<label for="<?php echo $config['option_name']; ?>-login_logo_home_link"><?php _e( 'Link logo to home page.', 'fx-login-customizer' ); ?></label>
+	</p>
+
+<?php }
+
 
 /* Load needed scripts for settings page */
 add_action( 'admin_enqueue_scripts', 'fx_login_customizer_enqueue' );
@@ -162,17 +235,24 @@ add_action( 'admin_enqueue_scripts', 'fx_login_customizer_enqueue' );
  */
 function fx_login_customizer_enqueue( $hook_suffix ){
 
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	/* Minify suffix for debug */
+	$min = '';
+	$min = '.min';
+
 	/* only load in f(x) Utility Settings page */
-	if ( $hook_suffix == myfx_page() ){
+	if ( $hook_suffix == $config['page'] ){
 
 		/* Background color picker */
-		wp_enqueue_script( 'fx-login-bg', FX_LOGIN_CUSTOMIZER_URI . 'js/login-bg-color.min.js', array( 'jquery', 'wp-color-picker' ), FX_LOGIN_CUSTOMIZER_VERSION, true );
+		wp_enqueue_script( 'fx-login-bg', FX_LOGIN_CUSTOMIZER_URI . "js/login-bg-color{$min}.js", array( 'jquery', 'wp-color-picker' ), FX_LOGIN_CUSTOMIZER_VERSION, true );
 
 		/* Enqueue WordPress media uploader script */
 		wp_enqueue_media();
 
 		/* Enqueue logo uploader script */
-		wp_enqueue_script( 'fx-login-logo-upload', FX_LOGIN_CUSTOMIZER_URI . 'js/login-logo-upload.min.js', array( 'jquery' ), FX_LOGIN_CUSTOMIZER_VERSION, true );
+		wp_enqueue_script( 'fx-login-logo-upload', FX_LOGIN_CUSTOMIZER_URI . "js/login-logo-upload{$min}.js", array( 'jquery' ), FX_LOGIN_CUSTOMIZER_VERSION, true );
 
 		/* Localize logo uploader script */
 		wp_localize_script( 'fx-login-logo-upload', 'fx_login_logo',
@@ -185,7 +265,7 @@ function fx_login_customizer_enqueue( $hook_suffix ){
 		);
 
 		/* Enqueue background uploader script */
-		wp_enqueue_script( 'fx-login-bg-upload', FX_LOGIN_CUSTOMIZER_URI . 'js/login-bg-upload.min.js', array( 'jquery' ), FX_LOGIN_CUSTOMIZER_VERSION, true );
+		wp_enqueue_script( 'fx-login-bg-upload', FX_LOGIN_CUSTOMIZER_URI . "js/login-bg-upload{$min}.js", array( 'jquery' ), FX_LOGIN_CUSTOMIZER_VERSION, true );
 
 		/* Localize logo uploader script */
 		wp_localize_script( 'fx-login-bg-upload', 'fx_login_bg',
@@ -197,7 +277,7 @@ function fx_login_customizer_enqueue( $hook_suffix ){
 		);
 
 		/* Enqueue CSS for Settings Page */
-		wp_enqueue_style( 'fx-login-customizer', FX_LOGIN_CUSTOMIZER_URI . 'css/login-customizer.min.css', array( 'thickbox', 'wp-color-picker' ), FX_LOGIN_CUSTOMIZER_VERSION );
+		wp_enqueue_style( 'fx-login-customizer', FX_LOGIN_CUSTOMIZER_URI . "css/login-customizer{$min}.css", array( 'thickbox', 'wp-color-picker' ), FX_LOGIN_CUSTOMIZER_VERSION );
 	}
 }
 
@@ -212,10 +292,13 @@ add_action( 'login_head', 'fx_login_customizer_print_style' );
  * @since 0.1.0
  */
 function fx_login_customizer_print_style() {
-	$logo = myfx_get_option( 'login_logo' );
-	$bg = myfx_get_option( 'login_bg' );
-	$color = myfx_get_option( 'login_bg_color' );
 
+	/* Get data */
+	$logo = fx_login_customizer_get_option( 'login_logo' );
+	$bg = fx_login_customizer_get_option( 'login_bg' );
+	$color = fx_login_customizer_get_option( 'login_bg_color' );
+
+	/* Open Sesame */
 	$css = '';
 	if ( $logo || $bg || $color != '#fbfbfb' ){
 		$css .= '<style id="fx-login-customizer" type="text/css">';
@@ -224,6 +307,8 @@ function fx_login_customizer_print_style() {
 		$css .= ( $color ? 'body.login{background-color:' . $color . ' !important}' : '' );
 		$css .= '</style>';
 	}
+
+	/* Close sesame */
 	echo $css;
 }
 
@@ -235,7 +320,7 @@ add_filter( 'login_headerurl', 'fx_login_customizer_login_logo_url' );
  * @since 0.1.0
  */
 function fx_login_customizer_login_logo_url( $url ) { 
-	if ( myfx_get_option( 'login_logo_home_link' ) )
+	if ( fx_login_customizer_get_option( 'login_logo_home_link' ) )
 		return home_url();
 	else
 		return $url;

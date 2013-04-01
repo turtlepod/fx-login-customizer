@@ -8,10 +8,10 @@ jQuery(document).ready(function($){
 	var fx_login_bg_media_frame;
 
 	// Bind to our click event in order to open up the new media experience.
-	$(document.body).on('click.myfxOpenMediaManager', '.fx-login-bg-upload', function(e){
+	$(document.body).on('click', '.fx-login-bg-upload', function(loginbgevent){
 
 		// Prevent the default action from occuring.
-		e.preventDefault();
+		loginbgevent.preventDefault();
 
 		// If the frame already exists, re-open it.
 		if ( fx_login_bg_media_frame ) {
@@ -52,7 +52,7 @@ jQuery(document).ready(function($){
 			var media_attachment = fx_login_bg_media_frame.state().get('selection').first().toJSON();
 
 			// Send the attachment URL to our custom input field.
-			$('#myfx-login_bg').val(media_attachment.url);
+			$('input:text.fx_login_customizer-login_bg').val(media_attachment.url);
 
 			// Send the attachment URL to our preview container.
 			$("#login-preview").css("background-image", "url(" + media_attachment.url + ")" );
@@ -66,10 +66,10 @@ jQuery(document).ready(function($){
 	});
 
 	// On remove button click event
-	$(document.body).on('click', '.fx-login-bg-remove', function(e){
+	$(document.body).on('click', '.fx-login-bg-remove', function(){
 
 		// Empty/delete input field
-		$('#myfx-login_bg').val('');
+		$('input:text.fx_login_customizer-login_bg').val('');
 
 		// Hide remove button
 		$('.fx-login-bg-remove').delay(100).fadeOut(300);
@@ -78,4 +78,3 @@ jQuery(document).ready(function($){
 		$("#login-preview").css("background-image", "none" );
 	});
 });
-

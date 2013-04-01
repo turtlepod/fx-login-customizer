@@ -5,7 +5,7 @@ jQuery(document).ready(function ($) {
 	'use strict';
 	// Initialize color picker
 	if (typeof jQuery.wp === 'object' && typeof jQuery.wp.wpColorPicker === 'function') {
-		$('input:text#myfx-login_bg_color').wpColorPicker({
+		$('input:text.fx_login_customizer-login_bg_color').wpColorPicker({
 			defaultColor: "#fbfbfb",
 			clear: false
 		});
