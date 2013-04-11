@@ -7,6 +7,52 @@
  * @since 0.1.0
  */
 
+/* Admin menu
+------------------------------------------ */
+
+/* Add settings under appearance page */
+add_action( 'admin_menu', 'fx_login_customizer_admin_menu' );
+
+/**
+ * Add admin menu under appearance
+ * @since 0.1.0
+ */
+function fx_login_customizer_admin_menu(){
+
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	/* Add theme page. */
+	$settings_page = add_theme_page( __( 'Login customize', 'fx-login-customizer' ), __( 'Login customize', 'fx-login-customizer' ), $config['capability'], $config['slug'], 'fx_login_customizer_settings_page' );
+
+	/* Check if the settings page is being shown before running any functions for it. */
+	if ( !empty( $settings_page ) ) {
+
+		/* Filter the settings page capability so that it recognizes the cap. */
+		add_filter( "option_page_capability_{$config['page']}", 'fx_login_customizer_settings_page_capability' );
+
+		/* Enqueue javascript and css needed. */
+		add_action( 'admin_enqueue_scripts', 'fx_login_customizer_enqueue_scripts' );
+	}
+}
+
+
+/**
+ * Settings Page Capability
+ * @since 0.1.0
+ */
+function fx_login_customizer_settings_page_capability(){
+
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	return $config['capability'];
+}
+
+
+/* Settings
+------------------------------------------ */
+
 /* Register settings field */
 add_action( 'admin_init' , 'fx_login_customizer_register_settings' );
 
@@ -24,6 +70,9 @@ function fx_login_customizer_register_settings() {
 
 		/* Register settings */
 		register_setting( $config['option_group'], $config['option_name'], 'fx_login_customizer_sanitize' );
+
+		/* Add setting section */
+		add_settings_section( 'login-customizer', '', 'fx_login_customizer_settings_section_callback', $config['section'] );
 	}
 }
 
@@ -82,87 +131,50 @@ function fx_login_customizer_validate_image( $input ){
 	return $output;
 }
 
+
+
 /**
- * Get Option helper function
+ * Settings Page
  * @since 0.1.0
  */
-function fx_login_customizer_get_option( $option = '' ) {
-
-	/* Bail early if no option defined */
-	if ( !$option ) return false;
+function fx_login_customizer_settings_page(){
 
 	/* Get settings config */
 	$config = fx_login_customizer_settings_config();
+?>
+	<div class="wrap">
 
-	/* Defaults */
-	$default = fx_login_customizer_defaults();
+		<?php screen_icon(); ?>
 
-	/* Get database and sanitize it */
-	$get_option = get_option( $config['option_name'], $default );
+		<h2><?php _e( 'Login customize', 'fx-login-customizer' ); ?></h2>
 
-	/* Get default if data not yet set */
-	if ( !isset( $get_option[ $option ] ) && isset( $default[ $option ] ) )
-		return $default[ $option ];
+		<?php settings_errors(); ?>
 
-	/* False if it's empty or not array */
-	if ( !is_array( $get_option ) || empty( $get_option[$option] ) )
-		return false;
+		<div class="login-custizer-settings-wrap">
 
-	/* If it's array return it */
-	if ( is_array( $get_option[$option] ) )
-		return $get_option[$option];
+			<form method="post" action="options.php">
 
-	/* if not array sanitize it */
-	else
-		return wp_kses_stripslashes( $get_option[$option] );
-}
+				<?php settings_fields( $config['option_group'] ); ?>
 
-/**
- * Default value.
- * @since 0.1.0
- */
-function fx_login_customizer_defaults(){
-	$settings = array();
-	$settings['login_logo'] = '';
-	$settings['login_bg'] = '';
-	$settings['login_bg_color'] = '#fbfbfb';
-	$settings['login_logo_home_link'] = 0;
-	return $settings;
-}
+				<?php do_settings_sections( $config['section'] ); ?>
+
+				<?php submit_button( esc_attr__( 'Update Settings', 'fx-login-customizer' ) ); ?>
+
+			</form>
+
+		</div><!-- .login-custizer-settings-wrap -->
+
+	</div><!-- .wrap -->
+
+<?php }
 
 
-/* Add login customizer setting meta box */
-add_action( 'add_meta_boxes', 'fx_login_customizer_add_meta_box' );
 
 /**
- * Add meta box
+ * Settings section page callback.
  * @since 0.1.0
  */
-function fx_login_customizer_add_meta_box() {
-
-	/* Get settings config */
-	$config = fx_login_customizer_settings_config();
-
-	/* Check capability */
-	if ( current_user_can( $config['capability'] ) ) {
- 
-		/* Add settings metabox */
-		add_meta_box(
-			'fx-login-customizer-mb',
-			__( 'Login Customizer', 'fx-login-customizer' ),
-			'fx_login_customizer_meta_box',
-			$config['page'],
-			'normal',
-			'low'
-		);
-	}
-}
-
-/**
- * Meta box Callback
- * @since 0.1.0
- */
-function fx_login_customizer_meta_box(){
+function fx_login_customizer_settings_section_callback(){
 
 	/* get config */
 	$config = fx_login_customizer_settings_config();
@@ -226,14 +238,65 @@ function fx_login_customizer_meta_box(){
 <?php }
 
 
-/* Load needed scripts for settings page */
-add_action( 'admin_enqueue_scripts', 'fx_login_customizer_enqueue' );
 
 /**
- * Enqueue Scripts and Styles needed for settings page
+ * Get Option helper function
  * @since 0.1.0
  */
-function fx_login_customizer_enqueue( $hook_suffix ){
+function fx_login_customizer_get_option( $option = '' ) {
+
+	/* Bail early if no option defined */
+	if ( !$option ) return false;
+
+	/* Get settings config */
+	$config = fx_login_customizer_settings_config();
+
+	/* Defaults */
+	$default = fx_login_customizer_defaults();
+
+	/* Get database and sanitize it */
+	$get_option = get_option( $config['option_name'], $default );
+
+	/* Get default if data not yet set */
+	if ( !isset( $get_option[ $option ] ) && isset( $default[ $option ] ) )
+		return $default[ $option ];
+
+	/* False if it's empty or not array */
+	if ( !is_array( $get_option ) || empty( $get_option[$option] ) )
+		return false;
+
+	/* If it's array return it */
+	if ( is_array( $get_option[$option] ) )
+		return $get_option[$option];
+
+	/* if not array sanitize it */
+	else
+		return wp_kses_stripslashes( $get_option[$option] );
+}
+
+
+/**
+ * Default value.
+ * @since 0.1.0
+ */
+function fx_login_customizer_defaults(){
+	$settings = array();
+	$settings['login_logo'] = '';
+	$settings['login_bg'] = '';
+	$settings['login_bg_color'] = '#fbfbfb';
+	$settings['login_logo_home_link'] = 0;
+	return $settings;
+}
+
+
+/* Enqueue Scripts
+------------------------------------------ */
+
+/**
+ * Enqueue Scripts and Styles needed for settings page.
+ * @since 0.1.0
+ */
+function fx_login_customizer_enqueue_scripts( $hook_suffix ){
 
 	/* Get settings config */
 	$config = fx_login_customizer_settings_config();
@@ -281,8 +344,10 @@ function fx_login_customizer_enqueue( $hook_suffix ){
 	}
 }
 
-/* Functions
-================================ */
+
+
+/* Do stuff 
+------------------------------------------ */
 
 /* Login CSS */
 add_action( 'login_head', 'fx_login_customizer_print_style' );

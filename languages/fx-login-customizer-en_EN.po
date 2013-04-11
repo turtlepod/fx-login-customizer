@@ -2,10 +2,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: f(x) Login Customizer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-25 04:02+0700\n"
+"POT-Creation-Date: 2013-04-08 22:26+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: dave <david.warna@gmail.com>\n"
-"Language-Team: David Chandra P. <david.warna@gmail.com>\n"
+"Language-Team: David Chandra P. <david@shellcreeper.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,69 +15,74 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/fx-settings.php:19
-msgid "Login Customizer"
+#: includes/settings.php:26
+#: includes/settings.php:149
+msgid "Login customize"
 msgstr ""
 
-#: includes/fx-settings.php:37
+#: includes/settings.php:161
+msgid "Update Settings"
+msgstr ""
+
+#: includes/settings.php:188
 msgid "Upload Logo"
 msgstr ""
 
-#: includes/fx-settings.php:40
-#: includes/fx-settings.php:180
+#: includes/settings.php:191
+#: includes/settings.php:325
 msgid "Remove Logo"
 msgstr ""
 
-#: includes/fx-settings.php:44
+#: includes/settings.php:195
 msgid "Upload Background"
 msgstr ""
 
-#: includes/fx-settings.php:47
-#: includes/fx-settings.php:193
+#: includes/settings.php:198
+#: includes/settings.php:338
 msgid "Remove Background"
 msgstr ""
 
-#: includes/fx-settings.php:73
+#: includes/settings.php:231
 msgid "Login logo size is 274 &times; 63, background will be tiled."
 msgstr ""
 
-#: includes/fx-settings.php:76
+#: includes/settings.php:235
 msgid "Link logo to home page."
 msgstr ""
 
-#: includes/fx-settings.php:178
+#: includes/settings.php:323
 msgid "Upload Login Logo"
 msgstr ""
 
-#: includes/fx-settings.php:179
+#: includes/settings.php:324
 msgid "Insert Login Logo"
 msgstr ""
 
-#: includes/fx-settings.php:191
+#: includes/settings.php:336
 msgid "Upload Login Background"
 msgstr ""
 
-#: includes/fx-settings.php:192
+#: includes/settings.php:337
 msgid "Insert Login Background"
 msgstr ""
 
-#: includes/updater.php:237
+#: includes/updater.php:238
 msgid "An Unexpected HTTP Error occurred during the API request."
 msgstr ""
 
-#: includes/updater.php:237
+#: includes/updater.php:238
 msgid "Try again"
 msgstr ""
 
-#: includes/updater.php:278
+#: includes/updater.php:279
 msgid "An unknown error occurred"
 msgstr ""
 
-#: includes/updater.php:314
+#: includes/updater.php:315
 msgid "The plugin has been updated, but could not be reactivated. Please reactivate it manually."
 msgstr ""
 
-#: includes/updater.php:315
+#: includes/updater.php:316
 msgid "Plugin reactivated successfully."
 msgstr ""
 
