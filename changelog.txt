@@ -1,0 +1,23 @@
+====================================
+f(x) Login Customizer Changelog
+====================================
+
+====================================
+Version 0.1.1 - 14 December, 2013
+------------------------------------
+- Add Changelog
+- Fix login style for WP 3.8
+- Display input: logo image url, background image url
+  (this is for making it easier using external images)
+- Update Language
+- Update the self-hosted plugin updater to version 0.1.4
+  Visit AutoHosted.com for more info.
+
+====================================
+Version 0.1.0 - 8 April, 2013
+------------------------------------
+- Initial Release
+
+====================================
+             = END =
+====================================

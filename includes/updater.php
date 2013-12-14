@@ -1,13 +1,4 @@
 <?php
-/**
- * Automatic Updater Class
- * Enable automatic updates for self hosted plugins
- * Using WordPress Plugin API
- * @package fx_Login_Customizer
- * @subpackage includes
- * @since 0.1.0
- */
-
 /* Prevent loading this file directly and/or if the class is already defined */
 if ( ! defined( 'ABSPATH' ) || class_exists( 'FX_Login_Customizer_Plugin_Updater' ) )
 	return;
@@ -30,10 +21,9 @@ if ( ! defined( 'ABSPATH' ) || class_exists( 'FX_Login_Customizer_Plugin_Updater
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version 0.1.0
+ * @version 0.1.4
  * @author David Chandra Purnama <david@shellcreeper.com>
- * @link http://shellcreeper.com
- * @link http://autohosted.com
+ * @link http://autohosted.com/
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @copyright Copyright (c) 2013, David Chandra Purnama
  */
@@ -57,20 +47,25 @@ class FX_Login_Customizer_Plugin_Updater{
 
 		/* default config */
 		$defaults = array(
-			'base'		=> '',
-			'repo_uri'	=> '',
-			'repo_slug'	=> '',
-			'key'		=> '',
-			'dashboard'	=> false,
+			'base'        => '',
+			'repo_uri'    => '',
+			'repo_slug'   => '',
+			'key'         => '',
+			'dashboard'   => false,
+			'username'    => false,
+			'autohosted'  => 'plugin.0.1.4',
 		);
 
 		/* merge configs and defaults */
 		$this->config = wp_parse_args( $config, $defaults );
 
+		/* disable request to wp.org repo */
+		add_filter( 'http_request_args', array( &$this, 'disable_wporg_request' ), 5, 2 );
+
 		/* check minimum config before doing stuff */
 		if ( !empty( $this->config['base'] ) && !empty ( $this->config['repo_uri'] ) && !empty ( $this->config['repo_slug'] ) ){
 
-			/* filters for admin */
+			/* filters for admin area only */
 			if ( is_admin() ) {
 
 				/* filter site transient "update_plugins" */
@@ -81,8 +76,100 @@ class FX_Login_Customizer_Plugin_Updater{
 
 				/* forder name fix */
 				add_filter( 'upgrader_post_install', array( &$this, 'upgrader_post_install' ), 10, 3 );
+
+				/* add dashboard widget for activation key */
+				if ( true === $this->config['dashboard'] ){
+					add_action( 'wp_dashboard_setup', array( &$this, 'add_dashboard_widget' ) );
+				}
 			}
 		}
+	}
+
+
+	/**
+	 * Disable request to wp.org plugin repository
+	 * this function is to remove update request data of this plugin to wp.org
+	 * so wordpress would not do update check for this plugin.
+	 *
+	 * @link http://markjaquith.wordpress.com/2009/12/14/excluding-your-plugin-or-theme-from-update-checks/
+	 * @since 0.1.2
+	 */
+	public function disable_wporg_request( $r, $url ){
+
+		/* WP.org plugin update check URL */
+		$wp_url_string = 'api.wordpress.org/plugins/update-check';
+
+		/* If it's not a plugin update check request, bail early */
+		if ( false === strpos( $url, $wp_url_string ) ){
+			return $r;
+		}
+
+		/* Get this plugin slug */
+		$plugin_slug = dirname( $this->config['base'] );
+
+		/* Get response body (json/serialize data) */
+		$r_body = wp_remote_retrieve_body( $r );
+
+		/* Get plugins request */
+		$r_plugins = '';
+		$r_plugins_json = false;
+		if( isset( $r_body['plugins'] ) ){
+
+			/* Check if data can be serialized */
+			if ( is_serialized( $r_body['plugins'] ) ){
+
+				/* unserialize data ( PRE WP 3.7 ) */
+				$r_plugins = @unserialize( $r_body['plugins'] );
+				$r_plugins = (array) $r_plugins; // convert object to array
+			}
+
+			/* if unserialize didn't work ( POST WP.3.7 using json ) */
+			else{
+				/* use json decode to make body request to array */
+				$r_plugins = json_decode( $r_body['plugins'], true );
+				$r_plugins_json = true;
+			}
+		}
+
+		/* this plugin */
+		$to_disable = '';
+
+		/* check if plugins request is not empty */
+		if  ( !empty( $r_plugins ) ){
+
+			/* All plugins */
+			$all_plugins = $r_plugins['plugins'];
+
+			/* Loop all plugins */
+			foreach ( $all_plugins as $plugin_base => $plugin_data ){
+
+				/* Only if the plugin have the same folder, because plugins can have different main file. */
+				if ( dirname( $plugin_base ) == $plugin_slug ){
+
+					/* get plugin to disable */
+					$to_disable = $plugin_base;
+				}
+			}
+
+			/* Unset this plugin only */
+			if ( !empty( $to_disable ) ){
+				unset(  $all_plugins[ $to_disable ] );
+			}
+
+			/* Merge plugins request back to request */
+			if ( true === $r_plugins_json ){ // json encode data
+				$r_plugins['plugins'] = $all_plugins;
+				$r['body']['plugins'] = json_encode( $r_plugins );
+			}
+			else{ // serialize data
+				$r_plugins['plugins'] = $all_plugins;
+				$r_plugins_object = (object) $r_plugins;
+				$r['body']['plugins'] = serialize( $r_plugins_object );
+			}
+		}
+
+		/* return the request */
+		return $r;
 	}
 
 
@@ -134,13 +221,30 @@ class FX_Login_Customizer_Plugin_Updater{
 		if ( $author && $author_uri ) $author = '<a href="' . esc_url_raw( $author_uri ) . '">' . $author . '</a>';
 		$updater_data['author'] = $author;
 
+		/* by user role */
+		if ( false === $this->config['username'] )
+			$updater_data['role'] = false;
+		else
+			$updater_data['role'] = true;
+
+		/* User name / login */
+		$username = '';
+		if ( false !== $this->config['username'] && false === $this->config['dashboard'] ) 
+			$username = $this->config['username'];
+		if ( true === $this->config['username'] && true === $this->config['dashboard'] ){
+			$widget_id = 'ahp_' . $slug . '_activation_key';
+			$widget_option = get_option( $widget_id );
+			$username = ( isset( $widget_option['username'] ) && !empty( $widget_option['username'] ) ) ? $widget_option['username'] : '' ;
+		}
+		$updater_data['login'] = $username;
+
 		/* Activation key */
 		$key = '';
 		if ( $this->config['key'] ) $key = md5( $this->config['key']);
 		if ( empty( $key ) && true === $this->config['dashboard'] ){
 			$widget_id = 'ahp_' . $slug . '_activation_key';
-			$key_db = get_option( $widget_id );
-			$key = ( $key_db['key'] ) ? md5( $key_db['key'] ) : '' ;
+			$widget_option = get_option( $widget_id );
+			$key = ( isset( $widget_option['key'] ) && !empty( $widget_option['key'] ) ) ? md5( $widget_option['key'] ) : '' ;
 		}
 		$updater_data['key'] = $key;
 
@@ -158,6 +262,9 @@ class FX_Login_Customizer_Plugin_Updater{
 		if ( !empty( $this->config['repo_slug'] ) )
 			$repo_slug = sanitize_title( $this->config['repo_slug'] );
 		$updater_data['repo_slug'] = $repo_slug;
+
+		/* Updater class id and version */
+		$updater_data['autohosted'] = esc_attr( $this->config['autohosted'] );
 
 		return $updater_data;
 	}
@@ -181,7 +288,7 @@ class FX_Login_Customizer_Plugin_Updater{
 
 		/* Get data from server */
 		$remote_url = add_query_arg( array( 'plugin_repo' => $updater_data['repo_slug'], 'ahpr_check' => $updater_data['version'] ), $updater_data['repo_uri'] );
-		$remote_request = array( 'timeout' => 20, 'body' => array( 'key' => $updater_data['key'] ), 'user-agent' => 'WordPress/' . $wp_version . '; ' . $updater_data['domain'] );
+		$remote_request = array( 'timeout' => 20, 'body' => array( 'key' => $updater_data['key'], 'login' => $updater_data['login'], 'autohosted' => $updater_data['autohosted'] ), 'user-agent' => 'WordPress/' . $wp_version . '; ' . $updater_data['domain'] );
 		$raw_response = wp_remote_post( $remote_url, $remote_request );
 
 		/* Error check */
@@ -213,6 +320,7 @@ class FX_Login_Customizer_Plugin_Updater{
 		return $checked_data;
 	}
 
+
 	/**
 	 * Filter Plugin API
 	 * 
@@ -225,12 +333,46 @@ class FX_Login_Customizer_Plugin_Updater{
 		/* Get needed data */
 		$updater_data = $this->updater_data();
 
+		/* Make sure $args is object */
+		if ( is_array($args) )
+			$args = (object)$args;
+
+		/* WP 3.7.1 get plugin slug.
+		----------------------------------- */
+		$plugin_slug = '';  /* default, empty */
+
+		/* Only if "slug" is not set yet */
+		if ( !isset( $args->slug ) ){
+
+			/* Get plugin "slug" from Plugin Info Iframe URL */
+			if ( isset( $_REQUEST['plugin'] ) ){
+				$plugin_slug = wp_unslash( $_REQUEST['plugin'] );
+			}
+
+			/* If it's not on plugin info iframe (e.g. update core page) */
+			else{
+
+				/* Check "$args" body request */
+				if ( isset( $args->body['request'] ) ){
+					$get_args_body = maybe_unserialize( $args->body['request'] );
+					if ( isset( $get_args_body->slug ) ){
+						$plugin_slug = $get_args_body->slug;
+					}
+				}
+			}
+		}
+
+		/* if "slug" is set, use it */
+		else{
+			$plugin_slug = $args->slug;
+		}
+
 		/* Get data only from current plugin, and only when call for "plugin_information" */
-		if ( isset( $args->slug ) && $args->slug == $updater_data['slug'] && $action == 'plugin_information' ){
+		if ( $plugin_slug == $updater_data['slug'] && $action == 'plugin_information' ){
 
 			/* Get data from server */
 			$remote_url = add_query_arg( array( 'plugin_repo' => $updater_data['repo_slug'], 'ahpr_info' => $updater_data['version'] ), $updater_data['repo_uri'] );
-			$remote_request = array( 'timeout' => 20, 'body' => array( 'key' => $updater_data['key'] ), 'user-agent' => 'WordPress/' . $wp_version . '; ' . $updater_data['domain'] );
+			$remote_request = array( 'timeout' => 20, 'body' => array( 'key' => $updater_data['key'], 'login' => $updater_data['login'], 'autohosted' => $updater_data['autohosted'] ), 'user-agent' => 'WordPress/' . $wp_version . '; ' . $updater_data['domain'] );
 			$request = wp_remote_post( $remote_url, $remote_request );
 
 			/* If error on retriving the data from repo */
@@ -313,10 +455,205 @@ class FX_Login_Customizer_Plugin_Updater{
 
 				/* Update message */
 				$fail = __( 'The plugin has been updated, but could not be reactivated. Please reactivate it manually.', 'fx-login-customizer' );
-				$success = __( 'Plugin reactivated successfully.', 'fx-login-customizer' );
+				$success = __( 'Plugin reactivated successfully. ', 'fx-login-customizer' );
 				echo is_wp_error( $activate ) ? $fail : $success;
 			}
 		}
 		return $result;
+	}
+
+
+	/**
+	 * Add Dashboard Widget
+	 * 
+	 * @since 0.1.0
+	 */
+	public function add_dashboard_widget() {
+
+		/* Get needed data */
+		$updater_data = $this->updater_data();
+
+		/* Widget ID, prefix with "ahp_" to make sure it's unique */
+		$widget_id = 'ahp_' . $updater_data['slug'] . '_activation_key';
+
+		/* Widget name */
+		$widget_name = $updater_data['name'] . __( ' Plugin Updates', 'fx-login-customizer' );
+
+		/* role check, in default install only administrator have this cap */
+		if ( current_user_can( 'update_plugins' ) ) {
+
+			/* add dashboard widget for acivation key */
+			wp_add_dashboard_widget( $widget_id, $widget_name, array( &$this, 'dashboard_widget_callback' ), array( &$this, 'dashboard_widget_control_callback' ) );
+		}
+	
+	}
+
+
+	/**
+	 * Dashboard Widget Callback
+	 * 
+	 * @since 0.1.0
+	 */
+	public function dashboard_widget_callback() {
+
+		/* Get needed data */
+		$updater_data = $this->updater_data();
+
+		/* Widget ID, prefix with "ahp_" to make sure it's unique */
+		$widget_id = 'ahp_' . $updater_data['slug'] . '_activation_key';
+
+		/* edit widget url */
+		$edit_url = 'index.php?edit=' . $widget_id . '#' . $widget_id;
+
+		/* get activation key from database */
+		$widget_option = get_option( $widget_id );
+
+		/* if activation key available/set */
+		if ( !empty( $widget_option ) && is_array( $widget_option ) ){
+
+			/* members only update */
+			if ( true === $updater_data['role'] ){
+
+				/* username */
+				$username = isset( $widget_option['username'] ) ? $widget_option['username'] : '';
+				echo '<p>'. __( 'Username: ', 'fx-login-customizer' ) . '<code>' . $username . '</code></p>';
+
+				/* activation key input */
+				$key = isset( $widget_option['key'] ) ? $widget_option['key'] : '' ;
+				echo '<p>'. __( 'Email: ', 'fx-login-customizer' ) . '<code>' . $key . '</code></p>';
+			}
+			else{
+
+				/* activation key input */
+				$key = isset( $widget_option['key'] ) ? $widget_option['key'] : '' ;
+				echo '<p>'. __( 'Key: ', 'fx-login-customizer' ) . '<code>' . $key . '</code></p>';
+			}
+
+
+			/* if key status is valid */
+			if ( $widget_option['status'] == 'valid' ){
+				_e( '<p>Your plugin update is <span style="color:green">active</span></p>', 'fx-login-customizer' );
+			}
+			/* if key is not valid */
+			elseif( $widget_option['status'] == 'invalid' ){
+				_e( '<p>Your input is <span style="color:red">not valid</span>, automatic updates is <span style="color:red">not active</span>.</p>', 'fx-login-customizer' );
+				echo '<p><a href="' . $edit_url . '" class="button-primary">' . __( 'Edit Key', 'fx-login-customizer' ) . '</a></p>';
+			}
+			/* else */
+			else{
+				_e( '<p>Unable to validate update activation.</p>', 'fx-login-customizer' );
+				echo '<p><a href="' . $edit_url . '" class="button-primary">' . __( 'Try again', 'fx-login-customizer' ) . '</a></p>';
+			}
+		}
+		/* if activation key is not yet set/empty */
+		else{
+			echo '<p><a href="' . $edit_url . '" class="button-primary">' . __( 'Add Key', 'fx-login-customizer' ) . '</a></p>';
+		}
+	}
+
+
+	/**
+	 * Dashboard Widget Control Callback
+	 * 
+	 * @since 0.1.0
+	 */
+	public function dashboard_widget_control_callback() {
+
+		/* Get needed data */
+		$updater_data = $this->updater_data();
+
+		/* Widget ID, prefix with "ahp_" to make sure it's unique */
+		$widget_id = 'ahp_' . $updater_data['slug'] . '_activation_key';
+
+		/* check options is set before saving */
+		if ( isset( $_POST[$widget_id] ) && isset( $_POST['dashboard-widget-nonce'] ) && wp_verify_nonce( $_POST['dashboard-widget-nonce'], 'edit-dashboard-widget_' . $widget_id ) ){
+
+			/* get submitted data */
+			$submit_data = $_POST[$widget_id];
+
+			/* username submitted */
+			$username = isset( $submit_data['username'] ) ? strip_tags( trim( $submit_data['username'] ) ) : '' ;
+
+			/* key submitted */
+			$key = isset( $submit_data['key'] ) ? strip_tags( trim( $submit_data['key'] ) ) : '' ;
+
+			/* get wp version */
+			global $wp_version;
+
+			/* get current domain */
+			$domain = $updater_data['domain'];
+
+			/* Get data from server */
+			$remote_url = add_query_arg( array( 'plugin_repo' => $updater_data['repo_slug'], 'ahr_check_key' => 'validate_key' ), $updater_data['repo_uri'] );
+			$remote_request = array( 'timeout' => 20, 'body' => array( 'key' => md5( $key ), 'login' => $username, 'autohosted' => $updater_data['autohosted'] ), 'user-agent' => 'WordPress/' . $wp_version . '; ' . $updater_data['domain'] );
+			$raw_response = wp_remote_post( $remote_url, $remote_request );
+
+			/* get response */
+			$response = '';
+			if ( !is_wp_error( $raw_response ) && ( $raw_response['response']['code'] == 200 ) )
+				$response = trim( wp_remote_retrieve_body( $raw_response ) );
+
+			/* if call to server sucess */
+			if ( !empty( $response ) ){
+
+				/* if key is valid */
+				if ( $response == 'valid' ) $valid = 'valid';
+
+				/* if key is not valid */
+				elseif ( $response == 'invalid' ) $valid = 'invalid';
+
+				/* if response is value is not recognized */
+				else $valid = 'unrecognized';
+			}
+			/* if response is empty or error */
+			else{
+				$valid = 'error';
+			}
+
+			/* database input */
+			$input = array(
+				'username' => $username,
+				'key' => $key,
+				'status' => $valid,
+			);
+
+			/* save value */
+			update_option( $widget_id, $input );
+		}
+
+		/* get activation key from database */
+		$widget_option = get_option( $widget_id );
+
+		/* default key, if it's not set yet */
+		$username_option = isset( $widget_option['username'] ) ? $widget_option['username'] : '' ;
+		$key_option = isset( $widget_option['key'] ) ? $widget_option['key'] : '' ;
+
+		/* display the form input for activation key */ ?>
+
+		<?php if ( true === $updater_data['role'] ) { // members only update ?>
+
+		<p>
+			<label for="<?php echo $widget_id; ?>-username"><?php _e( 'User name', 'fx-login-customizer' ); ?></label>
+		</p>
+		<p>
+			<input id="<?php echo $widget_id; ?>-username" name="<?php echo $widget_id; ?>[username]" type="text" value="<?php echo $username_option;?>"/>
+		</p>
+		<p>
+			<label for="<?php echo $widget_id; ?>-key"><?php _e( 'Email', 'fx-login-customizer' ); ?></label>
+		</p>
+		<p>
+			<input id="<?php echo $widget_id; ?>-key" class="regular-text" name="<?php echo $widget_id; ?>[key]" type="text" value="<?php echo $key_option;?>"/>
+		</p>
+
+		<?php } else { // activation keys ?>
+
+		<p>
+			<label for="<?php echo $widget_id; ?>-key"><?php _e( 'Activation Key', 'fx-login-customizer' ); ?></label>
+		</p>
+		<p>
+			<input id="<?php echo $widget_id; ?>-key" class="regular-text" name="<?php echo $widget_id; ?>[key]" type="text" value="<?php echo $key_option;?>"/>
+		</p>
+
+		<?php }
 	}
 }

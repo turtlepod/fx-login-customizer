@@ -180,10 +180,6 @@ function fx_login_customizer_settings_section_callback(){
 	$config = fx_login_customizer_settings_config();
 ?>
 
-	<input type="text" class="login-input-hidden fx_login_customizer-login_logo" id="<?php echo $config['option_name']; ?>-login_logo" name="<?php echo $config['option_name']; ?>[login_logo]" value="<?php echo fx_login_customizer_get_option( 'login_logo' ); ?>">
-
-	<input type="text" class="login-input-hidden fx_login_customizer-login_bg" id="<?php echo $config['option_name']; ?>-login_bg" name="<?php echo $config['option_name']; ?>[login_bg]" value="<?php echo fx_login_customizer_get_option( 'login_bg' ); ?>">
-
 	<p>
 		<a href="#" class="fx-login-logo-upload button button-primary"><?php _e( 'Upload Logo', 'fx-login-customizer' ); ?></a>
 		<span class="fx-login-logo-remove-wrap">
@@ -233,6 +229,13 @@ function fx_login_customizer_settings_section_callback(){
 	<p>
 		<input id="<?php echo $config['option_name']; ?>-login_logo_home_link" name="<?php echo $config['option_name']; ?>[login_logo_home_link]" type="checkbox" value="1" <?php checked( fx_login_customizer_get_option( 'login_logo_home_link' ), 1 ); ?>>
 		<label for="<?php echo $config['option_name']; ?>-login_logo_home_link"><?php _e( 'Link logo to home page.', 'fx-login-customizer' ); ?></label>
+	</p>
+	<p><label class="fx-login-logo-label-image-input" for="<?php echo $config['option_name']; ?>-login_logo"><?php _e( 'Logo Image URL: ','fx-login-customizer' ); ?></label>
+		<input type="text" class="fx_login_customizer-login_logo" id="<?php echo $config['option_name']; ?>-login_logo" name="<?php echo $config['option_name']; ?>[login_logo]" value="<?php echo fx_login_customizer_get_option( 'login_logo' ); ?>">
+	</p>
+
+	<p><label class="fx-login-logo-label-image-input" for="<?php echo $config['option_name']; ?>-login_bg"><?php _e( 'Logo Background URL: ','fx-login-customizer' ); ?></label>
+		<input type="text" class="fx_login_customizer-login_bg" id="<?php echo $config['option_name']; ?>-login_bg" name="<?php echo $config['option_name']; ?>[login_bg]" value="<?php echo fx_login_customizer_get_option( 'login_bg' ); ?>">
 	</p>
 
 <?php }
@@ -367,7 +370,7 @@ function fx_login_customizer_print_style() {
 	$css = '';
 	if ( $logo || $bg || $color != '#fbfbfb' ){
 		$css .= '<style id="fx-login-customizer" type="text/css">';
-		$css .= ( $logo ? 'h1 a {background-image:url(' . $logo . ') !important;}' : '' );
+		$css .= ( $logo ? '#login h1 a {background-image:url(' . $logo . ') !important;background-size:274px 63px !important;width:274px !important;height:63px !important;}' : '' );
 		$css .= ( $bg ? 'body.login{background-image:url(' . $bg . ') !important;}' : '' );
 		$css .= ( $color ? 'body.login{background-color:' . $color . ' !important}' : '' );
 		$css .= '</style>';
