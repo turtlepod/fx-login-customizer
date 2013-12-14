@@ -33,6 +33,16 @@
 .fx-login-bg-upload{
 	margin-left:20px !important;
 }
-.login-input-hidden{
-	display:none !important;
+.fx_login_customizer-login_logo{
+	width: 450px;
+	max-width: 100%;
+}
+.fx_login_customizer-login_bg{
+	width: 450px;
+	max-width: 100%;
+}
+.fx-login-logo-label-image-input{
+	width: 165px;
+	max-width: 100%;
+	display: inline-block;
 }

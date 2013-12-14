@@ -3,7 +3,7 @@
  * Plugin Name: f(x) Login Customizer
  * Plugin URI: https://github.com/turtlepod/fx-login-customizer
  * Description: Customize login page with preview.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: David Chandra Purnama
  * Author URI: http://shellcreeper.com/
  *
@@ -15,7 +15,7 @@
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * @package fx_Login_Customizer
- * @version 0.1.0
+ * @version 0.1.1
  * @author David Chandra Purnama <david@shellcreeper.com>
  * @copyright Copyright (c) 2013, David Chandra Purnama
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -25,7 +25,7 @@
 ------------------------------------------ */
 
 /* Set the constant path to the plugin directory URI. */
-define( 'FX_LOGIN_CUSTOMIZER_VERSION', '0.1.0' );
+define( 'FX_LOGIN_CUSTOMIZER_VERSION', '0.1.1' );
 
 /* Set the constant path to the plugin path. */
 define( 'FX_LOGIN_CUSTOMIZER_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
