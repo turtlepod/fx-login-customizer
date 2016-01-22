@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: f(x) Login Customizer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-22 20:27+0700\n"
+"POT-Creation-Date: 2016-01-23 05:20+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: dave <david.warna@gmail.com>\n"
 "Language-Team: David Chandra P. <david@shellcreeper.com>\n"
@@ -24,6 +24,14 @@ msgstr ""
 msgid "Customize Login Page"
 msgstr ""
 
-#: includes/customizer.php:65
+#: includes/customizer.php:53 includes/customizer.php:75
 msgid "Login Logo"
+msgstr ""
+
+#: includes/customizer.php:85
+msgid "Login Background"
+msgstr ""
+
+#: includes/customizer.php:104
+msgid "Background Color"
 msgstr ""

@@ -67,9 +67,9 @@ function fx_login_customizer_plugins_loaded(){
 	load_plugin_textdomain( 'fx-login-customizer', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 	/* Load functions and settings */
-	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/customizer.php' );
+	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/functions.php' );
 
 	/* Load functions and settings */
-	//require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/functions.php' );
+	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/customizer.php' );
 }
 

@@ -39,17 +39,27 @@ add_action( 'customize_register', 'fx_login_customizer_register' );
 function fx_login_customizer_register( $wp_customize ){
 
 	/* Add Section: Logo */
-	$wp_customize->add_section( 'fx_login_customizer',
+	$wp_customize->add_panel( 'fx_login_customizer',
 		array(
-			'title'         => __( 'Customize Login Page', 'fx-login-customizer' ),
+			'title'       => __( 'Customize Login Page', 'fx-login-customizer' ),
+		)
+	);
+
+	/* === LOGO === */
+
+	/* Add Section: Logo */
+	$wp_customize->add_section( 'fx_login_logo',
+		array(
+			'title'       => __( 'Login Logo', 'fx-login-customizer' ),
+			'panel'       => 'fx_login_customizer',
 		)
 	);
 
 	/* Add Setting: Logo */
 	$wp_customize->add_setting( 'fx_login_customizer[logo]',
 		array(
-			'type'          => 'option',
-			'capability'    => 'manage_options',
+			'type'        => 'option',
+			'capability'  => 'manage_options',
 		)
 	);
 
@@ -57,7 +67,7 @@ function fx_login_customizer_register( $wp_customize ){
 	if ( class_exists( 'WP_Customize_Cropped_Image_Control' ) ){ /* WP 4.3 */
 		$wp_customize->add_control( new WP_Customize_Cropped_Image_Control( $wp_customize, 'fx_login_logo',
 			array(
-				'section'       => 'fx_login_customizer',
+				'section'       => 'fx_login_logo',
 				'settings'      => 'fx_login_customizer[logo]',
 				'description'   => 'Image width is 280px. Image height is 80px.',
 				'width'         => 280,
@@ -66,6 +76,34 @@ function fx_login_customizer_register( $wp_customize ){
 			)
 		));
 	}
+
+	/* === BACKGROUND === */
+
+	/* Add Section: Background */
+	$wp_customize->add_section( 'fx_login_bg',
+		array(
+			'title'       => __( 'Login Background', 'fx-login-customizer' ),
+			'panel'       => 'fx_login_customizer',
+		)
+	);
+
+	/* Add Setting: Background Color */
+	$wp_customize->add_setting( 'fx_login_customizer[bg_color]',
+		array(
+			'type'        => 'option',
+			'default'     => '#F1F1F1',
+			'capability'  => 'manage_options',
+		)
+	);
+
+	/* Add Control: Background */
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'fx_login_bg_color',
+		array(
+			'section'       => 'fx_login_bg',
+			'settings'      => 'fx_login_customizer[bg_color]',
+			'label'         => __( 'Background Color', 'fx-login-customizer' ),
+		)
+	));
 
 }
 
@@ -80,13 +118,16 @@ function fx_login_customizer_hide_controls(){ ?>
 
 <?php if( isset( $_GET["url"] ) && ( urlencode( wp_login_url() ) == urlencode( $_GET["url"] ) ) ){ ?>
 	<style id="fx-login-customizer-hide-control" type="text/css">
-		.accordion-section:not(#accordion-section-fx_login_customizer){
+		.accordion-section:not(#accordion-panel-fx_login_customizer){
 			display: none !important;
+		}
+		#accordion-panel-fx_login_customizer .accordion-section{
+			display: block !important;
 		}
 	</style>
 <?php } else { ?>
 	<style id="fx-login-customizer-hide-control" type="text/css">
-		#accordion-section-fx_login_customizer{
+		#accordion-panel-fx_login_customizer{
 			display: none !important;
 		}
 	</style>
@@ -104,10 +145,20 @@ add_action( 'login_head', 'fx_login_customizer_login_head' );
 function fx_login_customizer_login_head(){
 	$css = '';
 	$option = get_option( 'fx_login_customizer' );
+
+	/* Logo */
 	if( isset( $option['logo'] ) && $option['logo'] ){
-		$image = wp_get_attachment_image_src( $option['logo'], 'full' );
-		if( isset( $image[0] ) ){
-			$css .= ".login h1 a{ background-image:url({$image[0]});width:280px;height:80px;background-size:280px 80px; }";
+		$logo = wp_get_attachment_image_src( $option['logo'], 'full' );
+		$logo_url = fx_login_customizer_sanitize_file_type( $logo[0], 'image' );
+		if( isset( $logo_url ) ){
+			$css .= ".login h1 a{ background-image:url({$logo_url});width:280px;height:80px;background-size:280px 80px; }";
+		}
+	}
+	/* Background Color */
+	if( isset( $option['bg_color'] ) ){
+		$bg_color = fx_login_customizer_sanitize_hex_color( $option['bg_color'] );
+		if( $bg_color && "#F1F1F1" != $bg_color ){
+			$css .= "body{ background-color: {$option['bg_color']}}";
 		}
 	}
 ?>
