@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: f(x) Login Customizer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-14 20:02+0700\n"
+"POT-Creation-Date: 2016-01-22 20:27+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: dave <david.warna@gmail.com>\n"
 "Language-Team: David Chandra P. <david@shellcreeper.com>\n"
@@ -12,134 +12,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _e;__;esc_attr_e;esc_attr__;esc_html_e;esc_html__;_x;"
 "_n;_x:1,2c;_n:1,2\n"
-"X-Poedit-Basepath: ../\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-Basepath: ..\n"
+"X-Generator: Poedit 1.8.6\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/settings.php:26 includes/settings.php:149
-msgid "Login customize"
+#: includes/customizer.php:19 includes/customizer.php:20
+msgid "Customize Login"
 msgstr ""
 
-#: includes/settings.php:161
-msgid "Update Settings"
+#: includes/customizer.php:44
+msgid "Customize Login Page"
 msgstr ""
 
-#: includes/settings.php:184
-msgid "Upload Logo"
-msgstr ""
-
-#: includes/settings.php:187 includes/settings.php:328
-msgid "Remove Logo"
-msgstr ""
-
-#: includes/settings.php:191
-msgid "Upload Background"
-msgstr ""
-
-#: includes/settings.php:194 includes/settings.php:341
-msgid "Remove Background"
-msgstr ""
-
-#: includes/settings.php:227
-msgid "Login logo size is 274 &times; 63, background will be tiled."
-msgstr ""
-
-#: includes/settings.php:231
-msgid "Link logo to home page."
-msgstr ""
-
-#: includes/settings.php:233
-msgid "Logo Image URL: "
-msgstr ""
-
-#: includes/settings.php:237
-msgid "Logo Background URL: "
-msgstr ""
-
-#: includes/settings.php:326
-msgid "Upload Login Logo"
-msgstr ""
-
-#: includes/settings.php:327
-msgid "Insert Login Logo"
-msgstr ""
-
-#: includes/settings.php:339
-msgid "Upload Login Background"
-msgstr ""
-
-#: includes/settings.php:340
-msgid "Insert Login Background"
-msgstr ""
-
-#: includes/updater.php:380
-msgid "An Unexpected HTTP Error occurred during the API request."
-msgstr ""
-
-#: includes/updater.php:380 includes/updater.php:545
-msgid "Try again"
-msgstr ""
-
-#: includes/updater.php:421
-msgid "An unknown error occurred"
-msgstr ""
-
-#: includes/updater.php:457
-msgid ""
-"The plugin has been updated, but could not be reactivated. Please reactivate "
-"it manually."
-msgstr ""
-
-#: includes/updater.php:458
-msgid "Plugin reactivated successfully. "
-msgstr ""
-
-#: includes/updater.php:480
-msgid " Plugin Updates"
-msgstr ""
-
-#: includes/updater.php:519
-msgid "Username: "
-msgstr ""
-
-#: includes/updater.php:523
-msgid "Email: "
-msgstr ""
-
-#: includes/updater.php:529
-msgid "Key: "
-msgstr ""
-
-#: includes/updater.php:535
-msgid "<p>Your plugin update is <span style=\"color:green\">active</span></p>"
-msgstr ""
-
-#: includes/updater.php:539
-msgid ""
-"<p>Your input is <span style=\"color:red\">not valid</span>, automatic "
-"updates is <span style=\"color:red\">not active</span>.</p>"
-msgstr ""
-
-#: includes/updater.php:540
-msgid "Edit Key"
-msgstr ""
-
-#: includes/updater.php:544
-msgid "<p>Unable to validate update activation.</p>"
-msgstr ""
-
-#: includes/updater.php:550
-msgid "Add Key"
-msgstr ""
-
-#: includes/updater.php:636
-msgid "User name"
-msgstr ""
-
-#: includes/updater.php:642
-msgid "Email"
-msgstr ""
-
-#: includes/updater.php:651
-msgid "Activation Key"
+#: includes/customizer.php:65
+msgid "Login Logo"
 msgstr ""
