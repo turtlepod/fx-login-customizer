@@ -3,7 +3,7 @@
  * Plugin Name: f(x) Login Customizer
  * Plugin URI: https://github.com/turtlepod/fx-login-customizer
  * Description: Customize login page with preview.
- * Version: 0.1.1
+ * Version: 1.0.0
  * Author: David Chandra Purnama
  * Author URI: http://shellcreeper.com/
  *
@@ -14,10 +14,8 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without 
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @package fx_Login_Customizer
- * @version 0.1.1
- * @author David Chandra Purnama <david@shellcreeper.com>
- * @copyright Copyright (c) 2013, David Chandra Purnama
+ * @author David Chandra Purnama <david@genbu.me>
+ * @copyright Copyright (c) 2016, Genbu Media
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
@@ -25,7 +23,7 @@
 ------------------------------------------ */
 
 /* Set the constant path to the plugin directory URI. */
-define( 'FX_LOGIN_CUSTOMIZER_VERSION', '0.1.1' );
+define( 'FX_LOGIN_CUSTOMIZER_VERSION', '1.0.0' );
 
 /* Set the constant path to the plugin path. */
 define( 'FX_LOGIN_CUSTOMIZER_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
@@ -69,32 +67,9 @@ function fx_login_customizer_plugins_loaded(){
 	load_plugin_textdomain( 'fx-login-customizer', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 	/* Load functions and settings */
-	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/settings.php' );
+	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/functions.php' );
+
+	/* Load functions and settings */
+	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/customizer.php' );
 }
 
-
-/* Updater
------------------------------------------- */
-
-/* Hook updater to init */
-add_action( 'init', 'fx_login_customizer_updater_init' );
-
-/**
- * Load and Activate Plugin Updater Class.
- * @since 0.1.0
- */
-function fx_login_customizer_updater_init() {
-
-	/* Load Plugin Updater */
-	require_once( FX_LOGIN_CUSTOMIZER_PATH . 'includes/updater.php' );
-
-	/* Updater Config */
-	$config = array(
-		'base'		=> plugin_basename( __FILE__ ), //required
-		'repo_uri'	=> 'http://repo.shellcreeper.com/',
-		'repo_slug'	=> 'fx-login-customizer',
-	);
-
-	/* Load Updater Class */
-	new FX_Login_Customizer_Plugin_Updater( $config );
-}
