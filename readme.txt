@@ -2,9 +2,9 @@
 Contributors: turtlepod
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TT23LVNKA3AU2
 Tags: private site, members only, protect rss
-Requires at least: 4.3
-Tested up to: 4.6
-Stable tag: 1.0.0
+Requires at least: 4.5
+Tested up to: 4.7
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,7 @@ After installation of this plugin, you upload logo and change your login page ba
 1. More features are coming.
 1. Automatically change logo URL to site home page.
 1. The GPL v2.0 or later license. :) Use it to make something cool.
-1. Support available at [Genbu Media](https://genbu.me/contact-us/).
+1. Support available at [Genbu Media](https://genbumedia.com/contact-us/).
 
 
 == Installation ==
@@ -46,6 +46,9 @@ The settings is using customizer API, you can navigate to "Appearance > Customiz
 1. Background Color.
 
 == Changelog ==
+
+= 1.0.1 - 09 Dec 2016 =
+* Compat with WP 4.7 and Panel.
 
 = 1.0.0 - 10 Jan 2015 =
 * Init
