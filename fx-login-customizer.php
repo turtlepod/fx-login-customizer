@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: f(x) Login Customizer
- * Plugin URI: https://github.com/turtlepod/fx-login-customizer
+ * Plugin URI: http://genbumedia.com/plugins/fx-login-customizer/
  * Description: Customize login page with preview.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: David Chandra Purnama
  * Author URI: http://shellcreeper.com/
  *
@@ -23,7 +23,7 @@
 ------------------------------------------ */
 
 /* Set the constant path to the plugin directory URI. */
-define( 'FX_LOGIN_CUSTOMIZER_VERSION', '1.0.0' );
+define( 'FX_LOGIN_CUSTOMIZER_VERSION', '1.0.1' );
 
 /* Set the constant path to the plugin path. */
 define( 'FX_LOGIN_CUSTOMIZER_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );

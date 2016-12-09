@@ -118,10 +118,13 @@ function fx_login_customizer_hide_controls(){ ?>
 
 <?php if( isset( $_GET["url"] ) && ( urlencode( wp_login_url() ) == urlencode( $_GET["url"] ) ) ){ ?>
 	<style id="fx-login-customizer-hide-control" type="text/css">
-		.accordion-section:not(#accordion-panel-fx_login_customizer){
+		.customize-pane-parent .accordion-section:not(#accordion-panel-fx_login_customizer){
 			display: none !important;
 		}
 		#accordion-panel-fx_login_customizer .accordion-section{
+			display: block !important;
+		}
+		#customize-controls #sub-accordion-panel-fx_login_customizer.current-panel{
 			display: block !important;
 		}
 	</style>
